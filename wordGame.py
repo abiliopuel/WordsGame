@@ -3,10 +3,10 @@ import time
 
 class WordsGame:
     def __init__(self):
-        self.words_list = ['consider', 'minute', 'around', 'accord', 'evident', 'practice', 'intend', 'concern', 'commit', 'issue', 'approach', 'establish', 'utter', 'conduct', 'engage', 'obtain',
+        self.wordsList = ['consider', 'minute', 'around', 'accord', 'evident', 'practice', 'intend', 'concern', 'commit', 'issue', 'approach', 'establish', 'utter', 'conduct', 'engage', 'obtain',
         'scarce', 'policy', 'straight', 'stock', 'apparent', 'property', 'fancy', 'concept', 'court', 'appoint', 'passage', 'vain', 'instance', 'coast', 'project']
-        self.words_in_game = []
-        self.words_amount = 10
+        self.wordsInGame = []
+        self.wordsAmount = 10
 
     def menu(self):
         print("================TYPE FAST GAME================")
@@ -18,14 +18,14 @@ class WordsGame:
         print("")
         print("=============================================")
         while True:
-            start_command = input("")
-            if start_command.upper() == "!START":
+            startCommand = input("")
+            if startCommand.upper() == "!START":
                 return self.inGame()
-            if start_command.upper() == "!OPTIONS":
+            if startCommand.upper() == "!OPTIONS":
                 return self.options()
-            if start_command.upper() == "!HELP":
-                return self.helpp()
-            elif start_command.upper() == "!CLOSE":
+            if startCommand.upper() == "!HELP":
+                return self.help()
+            elif startCommand.upper() == "!CLOSE":
                 print("Closing the game.")
                 exit()
             else:
@@ -42,20 +42,20 @@ class WordsGame:
         print("")
         print("=============================================")
         while True:
-            options_command = input("")
-            if "!words" in options_command:
-                options_command = options_command.replace("!words", "")
-                options_command = options_command.replace(" ", "")
-                options_command = int(options_command)
-                self.words_amount = options_command
-                print("Words amount defined to: {}.".format(self.words_amount))
+            optionsCommand = input("")
+            if "!words" in optionsCommand:
+                optionsCommand = optionsCommand.replace("!words", "")
+                optionsCommand = optionsCommand.replace(" ", "")
+                optionsCommand = int(optionsCommand)
+                self.wordsAmount = optionsCommand
+                print("Words amount defined to: {}.".format(self.wordsAmount))
                 continue
-            elif options_command.upper() == "!MENU":
+            elif optionsCommand.upper() == "!MENU":
                 return self.menu()
             else:
                 print("\nPlease use the listed commands.")
 
-    def helpp(self):
+    def help(self):
         print("====================HELP====================")
         print("")
         print("In this game your goal is to rewrite the")
@@ -68,17 +68,17 @@ class WordsGame:
         print("")
         print("===============================================")
         while True:
-            help_command = input("")
-            if help_command.upper() == "!MENU":
+            helpCommand = input("")
+            if helpCommand.upper() == "!MENU":
                 return self.menu()
             else:
                 print("\nPlease use the listed commands.")
 
     def inGame(self):
-        self.words_in_game.clear()
-        for i in range(self.words_amount):
-            self.words_in_game.append(self.words_list[random.randint(0, (len(self.words_list)-1))])
-        print(self.words_in_game)
+        self.wordsInGame.clear()
+        for i in range(self.wordsAmount):
+            self.wordsInGame.append(self.wordsList[random.randint(0, (len(self.wordsList)-1))])
+        print(self.wordsInGame)
         print("\nStarting in..")
         time.sleep(1)
         print("3")
@@ -89,28 +89,28 @@ class WordsGame:
         time.sleep(1)
         print("\nSTART TYPING...\n")
 
-        start_time = time.time()
-        words_writed = input("\n")
-        end_time = time.time()
-        words_writed2 = ("[{}]".format(words_writed))
-        words_writed_list = words_writed2.strip('][').split(' ')
-        words_correct = 0
+        startTime = time.time()
+        wordsWritten = input("\n")
+        endTime = time.time()
+        wordsWritten2 = ("[{}]".format(wordsWritten))
+        wordsWrittenList = wordsWritten2.strip('][').split(' ')
+        wordsCorrect = 0
         char = 0
 
-        for i in range(0, len(words_writed_list)):
-            if words_writed_list[i] == self.words_in_game[i]:
-                words_correct += 1
-                char = char + len(words_writed_list[i])
+        for i in range(0, len(wordsWrittenList)):
+            if wordsWrittenList[i] == self.wordsInGame[i]:
+                wordsCorrect += 1
+                char = char + len(wordsWrittenList[i])
 
-        gametime = end_time-start_time
-        wpm = (60*(((char/5)*words_correct)/len(self.words_in_game)))/gametime
+        gametime = endTime-startTime
+        wpm = (60*(((char/5)*wordsCorrect)/len(self.wordsInGame)))/gametime
                 
         print("")
         print("================GAME ENDED================")
         print("")
         print("Your pontuation:")
         print("  WPM: {:.2f}.".format(wpm))
-        print("  Accuracy: {0}/{1} ({2:.2f}%).".format(words_correct, len(self.words_in_game), (100*words_correct)/len(self.words_in_game)))
+        print("  Accuracy: {0}/{1} ({2:.2f}%).".format(wordsCorrect, len(self.wordsInGame), (100*wordsCorrect)/len(self.wordsInGame)))
         print("  Time: {:.2f}s.".format(gametime))
         print("")
         print("!menu -> Back to main menu.")
