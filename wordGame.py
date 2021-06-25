@@ -46,14 +46,15 @@ class WordsGame:
             if "!words" in optionsCommand:
                 optionsCommand = optionsCommand.replace("!words", "")
                 optionsCommand = optionsCommand.replace(" ", "")
-                optionsCommand = int(optionsCommand)
-                self.wordsAmount = optionsCommand
-                print("Words amount defined to: {}.".format(self.wordsAmount))
-                continue
+                if optionsCommand.isnumeric():
+                    optionsCommand = int(optionsCommand)
+                    self.wordsAmount = optionsCommand
+                    print("Words amount defined to: {}.".format(self.wordsAmount))
+                    continue
+                elif not optionsCommand.isnumeric():
+                    print("Please use !words and a valid number.")
             elif optionsCommand.upper() == "!MENU":
                 return self.menu()
-            else:
-                print("\nPlease use the listed commands.")
 
     def help(self):
         print("====================HELP====================")
@@ -117,6 +118,14 @@ class WordsGame:
         print("!close -> Close the game.")
         print("")
         print("==========================================")
+        while True:
+            endCommand = input("")
+            if endCommand.upper() == "!MENU":
+                return self.menu()
+            elif endCommand.upper() == "!CLOSE":
+                exit()
+            else:
+                print("\nPlease use the listed commands.")
 
 game = WordsGame()
 game.menu()
