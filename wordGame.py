@@ -34,6 +34,14 @@ class WordsGame:
             else:
                 print("\nPlease use the listed commands.")
 
+    def setWordsAmount(self, amount):
+        self.wordsAmount = amount
+
+    def setGameMode(self, gamemode):
+        previousGameMode = self.gameMode
+        self.gameMode = gamemode
+        gameModeChanged = (previousGameMode == gamemode)
+        return gameModeChanged
 
     def options(self):
         print(1000*"\n")
@@ -60,7 +68,7 @@ class WordsGame:
                 optionsCommand = optionsCommand.replace("!words ", "")
                 if optionsCommand.isnumeric():
                     optionsCommand = int(optionsCommand)
-                    self.wordsAmount = optionsCommand
+                    self.setWordsAmount(optionsCommand)
                     print("Words amount defined to: {}.".format(self.wordsAmount))
                     continue
                 elif not optionsCommand.isnumeric():
@@ -75,19 +83,18 @@ class WordsGame:
             elif optionsCommand[0:5].upper() == "!MODE":
                 optionsCommand = optionsCommand.replace("!mode ", "")
                 if optionsCommand.upper() == "RANDOM":
-                    if self.gameMode != "random":
+                    if self.setGameMode("random"):
                         print("You changed the game mode to random words.")
-                        self.gameMode = "random"
                     else:
                         print("The game mode is already on random words mode.")
                 elif optionsCommand.upper() == "CUSTOM":
                     if len(self.customWordsList) == 0:
                         print("You don't have a custom words list or you removed all words from your custom list.\nPlease do !custom and manage it.")
-                    elif len(self.customWordsList) > 0 and self.gameMode != "custom":
-                        print("You changed the game mode to custom words.")
-                        self.gameMode = "custom"
-                    elif len(self.customWordsList) > 0 and self.gameMode == "custom":
-                        print("The game mode is already on custom words mode.")
+                    else:
+                        if self.setGameMode("custom"):
+                            print("The game mode is already on custom words mode.")
+                        else:
+                            print("You changed the game mode to custom words.")
                 else:
                     print("The actual mode is: {}.".format(self.gameMode))
             else:
@@ -113,6 +120,36 @@ class WordsGame:
             else:
                 print("\nPlease use the listed commands.")
 
+    def appendCustomWord(self, customWord):
+        if customWord in self.customWordsList:
+            return False
+
+        self.customWordsList.append(customWord)
+        return True
+
+    def removeCustomWord(self, customWord):
+        if customWord not in self.customWordsList:
+            return False
+
+        self.customWordsList.remove(customWord)
+        return True
+
+    def clearCustomList(self):
+        if len(self.customWordsList) == 0:
+            return False
+        
+        self.customWordsList.clear()
+        return True
+
+    def showCustomList(self):
+        if len(self.customWordsList) == 0:
+            return False
+
+        print("This is your custom list:")
+        print(self.customWordsList)
+        return True
+         
+
     def custom(self):
         print(1000*"\n")
         print("=====================CUSTOM=====================")
@@ -137,38 +174,32 @@ class WordsGame:
                 if not customCommand.isnumeric():
                     if " " in customCommand:
                         print("Please add one word at a time.")
-                    elif customCommand not in self.customWordsList:
-                        self.customWordsList.append(customCommand)
-                        print("Added the \"{}\" word to your custom list.".format(customCommand))
                     else:
-                        print("The word \"{}\" is already on your custom list.".format(customCommand))
+                        if self.appendCustomWord(customCommand):
+                            print("Added the \"{}\" word to your custom list.".format(customCommand))
+                        else:
+                            print("The word \"{}\" is already on your custom list.".format(customCommand))
                 else:
                     print("Please don't use digits on your custom words.")
             #!remove
             elif customCommand[0:7].upper() == "!REMOVE":
                 customCommand = customCommand.replace("!remove ", "")
-                if customCommand in self.customWordsList:
-                    if " " not in customCommand:
-                        self.customWordsList.remove(customCommand)
+                if " " not in customCommand:
+                    if self.removeCustomWord(customCommand):
                         print("Removed the \"{}\" word from your custom list.".format(customCommand))
                     else:
-                        print("Please remove one word at a time.")
+                        print("This word is not on your custom list.")
                 else:
-                    print("This word aren't on your custom list.")
+                    print("Please remove one word at a time.")
             #!clear
             elif customCommand.upper() == "!CLEAR":
-                if len(self.customWordsList) == 0:
-                    print("You don't have a custom words list to clear.\nPlease use the commands in menu to manage it.")
-                else:
-                    self.customWordsList.clear()
+                if self.clearCustomList():
                     print("You cleared your custom list.")
-            #!scramble
+                else:
+                    print("You don't have a custom words list to clear.\nPlease use the commands in menu to manage it.")
             #!list
             elif customCommand.upper() == "!LIST":
-                if len(self.customWordsList) != 0:
-                    print("This is your custom list:")
-                    print(self.customWordsList)
-                else:
+                if not self.showCustomList():
                     print("You don't have a custom list. Use the commands in the menu to manage it.")
             #!menu
             elif customCommand.upper() == "!MENU":
@@ -200,17 +231,15 @@ class WordsGame:
         print("\nSTART TYPING...\n")
 
         startTime = time.time()
-        wordsWritten = input("\n")
+        wordsWritten = input("\n").split(" ")
         endTime = time.time()
-        wordsWritten2 = ("[{}]".format(wordsWritten))
-        wordsWrittenList = wordsWritten2.strip('][').split(' ')
         wordsCorrect = 0
         char = 0
 
-        for i in range(0, len(wordsWrittenList)):
-            if wordsWrittenList[i] == self.wordsInGame[i]:
+        for i in range(0, len(wordsWritten)):
+            if wordsWritten[i] == self.wordsInGame[i]:
                 wordsCorrect += 1
-                char = char + len(wordsWrittenList[i])
+                char = char + len(wordsWritten[i])
 
         gametime = endTime-startTime
         wpm = ((60*(((char/5)*wordsCorrect)/len(self.wordsInGame)))/gametime)
@@ -237,6 +266,12 @@ class WordsGame:
                 exit()
             else:
                 print("\nPlease use the listed commands.")
+
+class Menu:
+    def __init__(self):
+        self.game = WordsGame()
+
+
 
 game = WordsGame()
 game.menu()
