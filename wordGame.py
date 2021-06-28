@@ -1,5 +1,4 @@
-import random
-import time
+import random, time
 
 class WordsGame:
     def __init__(self):
@@ -9,8 +8,74 @@ class WordsGame:
         self.customWordsList = []
         self.wordsAmount = 10
         self.gameMode = "random"
+        self.wordsCorrect = 0
+        self.char = 0
 
-    def menu(self):
+    def setWordsAmount(self, amount):
+        self.wordsAmount = amount
+
+    def setGameMode(self, gamemode):
+        previousGameMode = self.gameMode
+        self.gameMode = gamemode
+        gameModeChanged = (previousGameMode == gamemode)
+        return gameModeChanged
+
+    def appendCustomWord(self, customWord):
+        if customWord in self.customWordsList:
+            return False
+
+        self.customWordsList.append(customWord)
+        return True
+
+    def removeCustomWord(self, customWord):
+        if customWord not in self.customWordsList:
+            return False
+
+        self.customWordsList.remove(customWord)
+        return True
+
+    def clearCustomList(self):
+        if len(self.customWordsList) == 0:
+            return False
+        
+        self.customWordsList.clear()
+        return True
+
+    def getCustomWordsList(self):
+        return self.customWordsList
+
+    def hasCustomList(self):
+        if len(self.customWordsList) == 0:
+            return False
+
+        return True
+         
+    def preGameConfig(self):
+        print(1000*"\n")
+        self.wordsInGame.clear()
+        if self.gameMode == "random":
+            for i in range(self.wordsAmount):
+                self.wordsInGame.append(self.wordsList[random.randint(0, (len(self.wordsList)-1))])
+        if self.gameMode == "custom":
+            for i in range(self.wordsAmount):
+                self.wordsInGame.append(self.customWordsList[random.randint(0, (len(self.customWordsList)-1))])
+        menu.preGame()
+
+    def inGame(self):
+        self.startTime = time.time()
+        wordsWritten = input("\n").split(" ")
+        self.endTime = time.time()
+
+        for i in range(0, len(wordsWritten)):
+            if wordsWritten[i] == self.wordsInGame[i]:
+                self.wordsCorrect += 1
+                self.char = self.char + len(wordsWritten[i])
+        
+        menu.endMenu()
+
+class Menu:
+
+    def mainMenu(self):
         print(1000*"\n")
         print("================TYPE FAST GAME================")
         print("")
@@ -23,27 +88,18 @@ class WordsGame:
         while True:
             startCommand = input("")
             if startCommand.upper() == "!START":
-                return self.inGame()
+                return game.preGameConfig()
             if startCommand.upper() == "!OPTIONS":
-                return self.options()
+                return self.optionsMenu()
             if startCommand.upper() == "!HELP":
-                return self.help()
+                return self.helpMenu()
             elif startCommand.upper() == "!CLOSE":
                 print("Closing the game.")
                 exit()
             else:
                 print("\nPlease use the listed commands.")
 
-    def setWordsAmount(self, amount):
-        self.wordsAmount = amount
-
-    def setGameMode(self, gamemode):
-        previousGameMode = self.gameMode
-        self.gameMode = gamemode
-        gameModeChanged = (previousGameMode == gamemode)
-        return gameModeChanged
-
-    def options(self):
+    def optionsMenu(self):
         print(1000*"\n")
         print("=====================OPTIONS=====================")
         print("")
@@ -68,89 +124,39 @@ class WordsGame:
                 optionsCommand = optionsCommand.replace("!words ", "")
                 if optionsCommand.isnumeric():
                     optionsCommand = int(optionsCommand)
-                    self.setWordsAmount(optionsCommand)
-                    print("Words amount defined to: {}.".format(self.wordsAmount))
+                    game.setWordsAmount(optionsCommand)
+                    print("Words amount defined to: {}.".format(game.wordsAmount))
                     continue
                 elif not optionsCommand.isnumeric():
-                    print("The actual amount of words in your game is: {}.".format(self.wordsAmount))
+                    print("The actual amount of words in your game is: {}.".format(game.wordsAmount))
             #!menu
             elif optionsCommand.upper() == "!MENU":
-                return self.menu()
+                return self.mainMenu()
             #!custom
             elif optionsCommand.upper() == "!CUSTOM":
-                return self.custom()
+                return self.customMenu()
             #!mode
             elif optionsCommand[0:5].upper() == "!MODE":
                 optionsCommand = optionsCommand.replace("!mode ", "")
                 if optionsCommand.upper() == "RANDOM":
-                    if self.setGameMode("random"):
+                    if game.setGameMode("random"):
                         print("You changed the game mode to random words.")
                     else:
                         print("The game mode is already on random words mode.")
                 elif optionsCommand.upper() == "CUSTOM":
-                    if len(self.customWordsList) == 0:
+                    if len(game.customWordsList) == 0:
                         print("You don't have a custom words list or you removed all words from your custom list.\nPlease do !custom and manage it.")
                     else:
-                        if self.setGameMode("custom"):
+                        if game.setGameMode("custom"):
                             print("The game mode is already on custom words mode.")
                         else:
                             print("You changed the game mode to custom words.")
                 else:
-                    print("The actual mode is: {}.".format(self.gameMode))
+                    print("The actual mode is: {}.".format(game.gameMode))
             else:
                 print("Please use the listed commands.")
 
-    def help(self):
-        print(1000*"\n")
-        print("====================HELP====================")
-        print("")
-        print("In this game your goal is to rewrite the")
-        print("listed words as quickly as you can.")
-        print("At the end of each match, you will have")
-        print("acess to your score. There you can find your")
-        print("WPM(Words per minute), time and accuracy.")
-        print("")
-        print("!menu -> Back to main menu.")
-        print("")
-        print("===============================================")
-        while True:
-            helpCommand = input("")
-            if helpCommand.upper() == "!MENU":
-                return self.menu()
-            else:
-                print("\nPlease use the listed commands.")
-
-    def appendCustomWord(self, customWord):
-        if customWord in self.customWordsList:
-            return False
-
-        self.customWordsList.append(customWord)
-        return True
-
-    def removeCustomWord(self, customWord):
-        if customWord not in self.customWordsList:
-            return False
-
-        self.customWordsList.remove(customWord)
-        return True
-
-    def clearCustomList(self):
-        if len(self.customWordsList) == 0:
-            return False
-        
-        self.customWordsList.clear()
-        return True
-
-    def showCustomList(self):
-        if len(self.customWordsList) == 0:
-            return False
-
-        print("This is your custom list:")
-        print(self.customWordsList)
-        return True
-         
-
-    def custom(self):
+    def customMenu(self):
         print(1000*"\n")
         print("=====================CUSTOM=====================")
         print("")
@@ -175,7 +181,7 @@ class WordsGame:
                     if " " in customCommand:
                         print("Please add one word at a time.")
                     else:
-                        if self.appendCustomWord(customCommand):
+                        if game.appendCustomWord(customCommand):
                             print("Added the \"{}\" word to your custom list.".format(customCommand))
                         else:
                             print("The word \"{}\" is already on your custom list.".format(customCommand))
@@ -185,7 +191,7 @@ class WordsGame:
             elif customCommand[0:7].upper() == "!REMOVE":
                 customCommand = customCommand.replace("!remove ", "")
                 if " " not in customCommand:
-                    if self.removeCustomWord(customCommand):
+                    if game.removeCustomWord(customCommand):
                         print("Removed the \"{}\" word from your custom list.".format(customCommand))
                     else:
                         print("This word is not on your custom list.")
@@ -193,64 +199,68 @@ class WordsGame:
                     print("Please remove one word at a time.")
             #!clear
             elif customCommand.upper() == "!CLEAR":
-                if self.clearCustomList():
+                if game.clearCustomList():
                     print("You cleared your custom list.")
                 else:
                     print("You don't have a custom words list to clear.\nPlease use the commands in menu to manage it.")
             #!list
             elif customCommand.upper() == "!LIST":
-                if not self.showCustomList():
+                if game.hasCustomList():
+                    print("This is your custom list:")
+                    print(game.getCustomWordsList())
+                else:
                     print("You don't have a custom list. Use the commands in the menu to manage it.")
             #!menu
             elif customCommand.upper() == "!MENU":
-                return self.menu()
+                return self.Mainmenu()
             #!options
             elif customCommand.upper() == "!OPTIONS":
-                return self.options()
+                return self.optionsMenu()
             else:
                 print("Please use the listed commands.")
 
-    def inGame(self):
+    def helpMenu(self):
         print(1000*"\n")
-        self.wordsInGame.clear()
-        if self.gameMode == "random":
-            for i in range(self.wordsAmount):
-                self.wordsInGame.append(self.wordsList[random.randint(0, (len(self.wordsList)-1))])
-        if self.gameMode == "custom":
-            for i in range(self.wordsAmount):
-                self.wordsInGame.append(self.customWordsList[random.randint(0, (len(self.customWordsList)-1))])
-        print(self.wordsInGame)
+        print("====================HELP====================")
+        print("")
+        print("In this game your goal is to rewrite the")
+        print("listed words as quickly as you can.")
+        print("At the end of each match, you will have")
+        print("acess to your score. There you can find your")
+        print("WPM(Words per minute), time and accuracy.")
+        print("")
+        print("!menu -> Back to main menu.")
+        print("")
+        print("===============================================")
+        while True:
+            helpCommand = input("")
+            if helpCommand.upper() == "!MENU":
+                return self.mainMenu()
+            else:
+                print("\nPlease use the listed commands.")
+
+    def preGame(self):
+        print(game.wordsInGame)
         print("\nStarting in..")
-        time.sleep(1)
+        time.sleep(0.1)
         print("3")
-        time.sleep(1)
+        time.sleep(0.1)
         print("2")
-        time.sleep(1)
+        time.sleep(0.1)
         print("1")
-        time.sleep(1)
+        time.sleep(0.1)
         print("\nSTART TYPING...\n")
+        game.inGame()
 
-        startTime = time.time()
-        wordsWritten = input("\n").split(" ")
-        endTime = time.time()
-        wordsCorrect = 0
-        char = 0
 
-        for i in range(0, len(wordsWritten)):
-            if wordsWritten[i] == self.wordsInGame[i]:
-                wordsCorrect += 1
-                char = char + len(wordsWritten[i])
-
-        gametime = endTime-startTime
-        wpm = ((60*(((char/5)*wordsCorrect)/len(self.wordsInGame)))/gametime)
-                
+    def endMenu(self):
         print(1000*"\n")
         print("================GAME ENDED================")
         print("")
         print("Your pontuation:")
-        print("  WPM: {:.2f}.".format(wpm))
-        print("  Accuracy: {0}/{1} ({2:.2f}%).".format(wordsCorrect, len(self.wordsInGame), (100*wordsCorrect)/len(self.wordsInGame)))
-        print("  Time: {:.2f}s.".format(gametime))
+        print("  WPM: {:.2f}.".format(score.WPM()))
+        print("  Accuracy: {0}/{1} ({2}%).".format(score.accuracyWordsCorrect(), score.accuracyWordsInGame(), score.accuracyPorcentage()))
+        print("  Time: {:.2f}s.".format(score.scoretime()))
         print("")
         print("!menu -> Back to main menu.")
         print("!close -> Close the game.")
@@ -260,18 +270,33 @@ class WordsGame:
         while True:
             endCommand = input("")
             if endCommand.upper() == "!MENU":
-                return self.menu()
+                return self.mainMenu()
             elif endCommand.upper() == "!CLOSE":
                 print("Closing the game.")
                 exit()
             else:
                 print("\nPlease use the listed commands.")
 
-class Menu:
-    def __init__(self):
-        self.game = WordsGame()
+class Score:
 
+    def WPM(self):
+        wpm = ((60*(((game.char/5)*game.wordsCorrect)/len(game.wordsInGame)))/(game.endTime - game.startTime))
+        return wpm
 
+    def accuracyWordsCorrect(self):
+        return game.wordsCorrect
 
+    def accuracyWordsInGame(self):
+        return len(game.wordsInGame)
+
+    def accuracyPorcentage(self):
+        porcentage = (100*game.wordsCorrect/len(game.wordsInGame))
+        return porcentage
+
+    def scoretime(self):
+        return (game.endTime - game.startTime)
+
+menu = Menu()
+score = Score()
 game = WordsGame()
-game.menu()
+menu.mainMenu()
